@@ -1,0 +1,11 @@
+{
+  "name": "get2gether",
+  "version": "0.0.0",
+  "description": "Let's Get Together API backend",
+  "main": "server.js",
+  "dependencies": {
+    "express": "~4.10.2",
+    "mongolian": "~0.1.18",
+    "moment": "~2.8.3"
+  }
+}

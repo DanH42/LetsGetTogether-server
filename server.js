@@ -6,10 +6,10 @@ var moment = require('moment');
 
 app.listen(8800, '127.0.0.1');
 
-app.get('/api', function(req, res){
+app.get('/', function(req, res){
 	fs.readFile('README.md', function(err, data){
 		if(!err && data){
-			marked(data, function(err, html){
+			marked(data + '', function(err, html){
 				if(!err && data)
 					res.send(html);
 				else

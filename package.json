@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "~4.10.2",
     "mongolian": "~0.1.18",
+    "marked": "~0.3.2",
     "moment": "~2.8.3"
   }
 }

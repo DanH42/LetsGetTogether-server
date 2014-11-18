@@ -1,2 +1,4 @@
-LetsGetTogether-server
-======================
+API Documentation
+=================
+
+The API currently does *absolutely nothing*

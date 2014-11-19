@@ -12,7 +12,7 @@ app.use(function(req, res, next){
 	});
 	req.on('end', function(){
 		try{
-			req.json = JSON.parse(req.body);
+			req.json = JSON.parse(data);
 		}catch(e){
 			req.json = {};
 		}

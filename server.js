@@ -27,7 +27,7 @@ app.use(function(req, res, next){
 	}
 
 	next();
-);
+});
 
 app.listen(8800, '127.0.0.1');
 

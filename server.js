@@ -90,7 +90,7 @@ app.get('/api/createApp', function(req, res){
 	res.send({key: key});
 });
 
-app.get('/api/checkAuth', function(req, res){
+app.post('/api/checkAuth', function(req, res){
 	checkAuth(req, res, function(){
 		res.send({success: true});
 	});

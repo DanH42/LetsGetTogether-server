@@ -55,7 +55,7 @@ app.get('/api', function(req, res){
 
 function checkAuth(req, res, callback){
 	if(!req.json.apiKey)
-		return res.sendError(res, "No API key supplied");
+		return res.sendError("No API key supplied");
 
 	db.apps.findOne({key: req.json.apiKey}, function(err, app){
 		if(!err && app){

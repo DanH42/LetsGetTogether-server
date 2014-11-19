@@ -39,7 +39,7 @@ var db = {
 	reviews: mongo.collection("reviews")
 };
 
-app.get('/', function(req, res){
+app.get('/api', function(req, res){
 	fs.readFile('README.md', function(err, data){
 		if(!err && data){
 			marked(data + '', function(err, html){
@@ -77,7 +77,7 @@ var guid = (function(){
 	};
 })();
 
-app.get('/createApp', function(req, res){
+app.get('/api/createApp', function(req, res){
 	var key = guid();
 
 	// Asynchronous, but this is temporary anyway
@@ -90,7 +90,7 @@ app.get('/createApp', function(req, res){
 	res.send({key: key});
 });
 
-app.get('/checkAuth', function(req, res){
+app.get('/api/checkAuth', function(req, res){
 	checkAuth(req, res, function(){
 		res.send({success: true});
 	});

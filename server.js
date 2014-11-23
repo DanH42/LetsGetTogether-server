@@ -3,6 +3,21 @@ var app = express();
 var fs = require('fs');
 var marked = require('marked');
 var moment = require('moment');
+var passport = require('passport');
+var FacebookStrategy = require('passport-facebook').Strategy;
+
+// These credentials shouldn't really be stored here, but meh
+passport.use(new FacebookStrategy({
+		clientID: "175237175154175237175154",
+		clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
+		callbackURL: "https://get2gether.me/api/auth/facebook/callback"
+	}, function(accessToken, refreshToken, profile, done){
+		User.findOrCreate(..., function(err, user) {
+			if (err) { return done(err); }
+				done(null, user);
+		});
+	}
+));
 
 app.use(function(req, res, next){
 	var data = '';
@@ -52,6 +67,17 @@ app.get('/api', function(req, res){
 			res.send("Unable to display API docs :(");
 	});
 });
+
+app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}));
+
+app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
+	failureRedirect: '/login/failure.html',
+	session: false
+}, function(req, res){
+	// Success!
+	res.send(req.user);
+	//res.redirect('/login/success.html');
+}));
 
 function checkAuth(req, res, callback){
 	if(!req.json.apiKey)

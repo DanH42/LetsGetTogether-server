@@ -12,10 +12,7 @@ passport.use(new FacebookStrategy({
 		clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
 		callbackURL: "https://get2gether.me/api/auth/facebook/callback"
 	}, function(accessToken, refreshToken, profile, done){
-		User.findOrCreate(..., function(err, user) {
-			if (err) { return done(err); }
-				done(null, user);
-		});
+		done(null, profile);
 	}
 ));
 

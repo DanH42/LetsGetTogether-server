@@ -9,7 +9,7 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 // These credentials shouldn't really be stored here, but meh
 passport.use(new FacebookStrategy({
 		clientID: "175237175154",
-		clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
+		clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf29e29a1dba3c5d2ccaec27f543848dbf2",
 		callbackURL: "https://get2gether.me/api/auth/facebook/callback"
 	}, function(accessToken, refreshToken, profile, done){
 		done(null, profile);
@@ -70,11 +70,11 @@ app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}
 app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 	failureRedirect: '/login/failure.html',
 	session: false
-}, function(req, res){
+}), function(req, res){
 	// Success!
 	res.send(req.user);
 	//res.redirect('/login/success.html');
-}));
+});
 
 function checkAuth(req, res, callback){
 	if(!req.json.apiKey)

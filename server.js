@@ -12,7 +12,18 @@ passport.use(new FacebookStrategy({
 		clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
 		callbackURL: "https://get2gether.me/api/auth/facebook/callback"
 	}, function(accessToken, refreshToken, profile, done){
-		done(null, profile);
+		db.users.findOne({id: profile.id}, function(err, user){
+			if(!err && user)
+				return done(null, user);
+
+			var newUser = {
+				id: profile.id,
+				name: profile.displayName,
+				image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100"
+			};
+			db.users.insert(newUser);
+			done(null, newUser);
+		});
 	}
 ));
 
@@ -47,7 +58,6 @@ var mongo = new (require("mongolian"))({log:{debug:function(){}}}).db("get2gethe
 var db = {
 	apps: mongo.collection("apps"),
 	users: mongo.collection("users"),
-	logins: mongo.collection("logins"),
 	reviews: mongo.collection("reviews")
 };
 
@@ -71,9 +81,23 @@ app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 	failureRedirect: '/login/failure.html',
 	session: false
 }), function(req, res){
-	// Success!
-	res.send(req.user);
-	//res.redirect('/login/success.html');
+	// This should be a real, temporary access token. Instead, it's 4 random 
+	// numbers hung on the front of the user's ID.
+	res.redirect('/#/auth/' + s4() + req.user.id);
+});
+
+app.post('/api/getUserData', function(req, res){
+	if(!req.json.token)
+		return res.sendError("No user access token supplied");
+
+	// Again, this should actually be checked. Instead, we just strip out the
+	// first 4 characters and see if that user ID exists in the database.
+	var userID = req.json.token.substr(4);
+	db.users.findOne({id: userID}, function(err, user){
+		if(!err && user)
+			return res.sendError("Invalid access  token");
+		res.send(user);
+	});
 });
 
 function checkAuth(req, res, callback){
@@ -90,15 +114,14 @@ function checkAuth(req, res, callback){
 			res.sendError("Invalid API key supplied");
 	});
 }
-var guid = (function(){
-	function s4(){
-		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	}
 
-	return function(){
-		return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-	};
-})();
+function s4(){
+	return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+}
+
+function guid(){
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
 
 app.get('/api/createApp', function(req, res){
 	var key = guid();

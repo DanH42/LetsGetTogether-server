@@ -94,8 +94,8 @@ app.post('/api/getUserData', function(req, res){
 	// first 4 characters and see if that user ID exists in the database.
 	var userID = req.json.token.substr(4);
 	db.users.findOne({id: userID}, function(err, user){
-		if(!err && user)
-			return res.sendError("Invalid access  token");
+		if(err || !user)
+			return res.sendError("Invalid access token");
 		res.send(user);
 	});
 });

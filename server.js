@@ -87,7 +87,7 @@ app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 }), function(req, res){
 	// This should be a real, temporary access token. Instead, it's 4 random 
 	// numbers hung on the front of the user's ID.
-	res.redirect('http://localhost:9000/#/auth/' + s4() + req.user.id);
+	res.redirect('http://get2gether.me/#/auth/' + s4() + req.user.id);
 });
 
 // Given the access token of a logged-in user, get their account details

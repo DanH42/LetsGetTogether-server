@@ -27,6 +27,7 @@ passport.use(new FacebookStrategy({
 	}
 ));
 
+// Add req.json to all incoming requests to easily process data
 app.use(function(req, res, next){
 	var data = '';
 	req.setEncoding('utf8');
@@ -44,6 +45,7 @@ app.use(function(req, res, next){
 	});
 });
 
+// Add a res.sendError function to all requests
 app.use(function(req, res, next){
 	res.sendError = function(err){
 		res.send({error: err});
@@ -54,6 +56,7 @@ app.use(function(req, res, next){
 
 app.listen(8800, '127.0.0.1');
 
+// Initialize database connection
 var mongo = new (require("mongolian"))({log:{debug:function(){}}}).db("get2gether");
 var db = {
 	apps: mongo.collection("apps"),
@@ -61,6 +64,7 @@ var db = {
 	reviews: mongo.collection("reviews")
 };
 
+// If someone simply requests /api, render the readme as HTML
 app.get('/api', function(req, res){
 	fs.readFile('README.md', function(err, data){
 		if(!err && data){
@@ -86,6 +90,7 @@ app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 	res.redirect('/#/auth/' + s4() + req.user.id);
 });
 
+// Given the access token of a logged-in user, get their account details
 app.post('/api/getUserData', function(req, res){
 	if(!req.json.token)
 		return res.sendError("No user access token supplied");
@@ -100,6 +105,8 @@ app.post('/api/getUserData', function(req, res){
 	});
 });
 
+// The supplied callback will be called only if the request contains a valid
+// and active API key. Otherwise, an error will be sent as a response.
 function checkAuth(req, res, callback){
 	if(!req.json.apiKey)
 		return res.sendError("No API key supplied");
@@ -123,7 +130,10 @@ function guid(){
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
-app.get('/api/createApp', function(req, res){
+// Temporary way to create an API key. This should be replaced with something
+// more robust and less prone to collisions
+app.all('/api/createApp', function(req, res){
+	// This key is randomly generated, and NOT checked for uniqueness
 	var key = guid();
 
 	// Asynchronous, but this is temporary anyway
@@ -133,7 +143,7 @@ app.get('/api/createApp', function(req, res){
 		isDisabled: false
 	});
 
-	res.send({key: key});
+	res.send({apiKey: key});
 });
 
 app.post('/api/checkAuth', function(req, res){

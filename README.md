@@ -8,8 +8,8 @@ This API has two levels:
 
 All requests to either API level should be made via POST to `https://get2gether.me/api/[method]`, and their payload should be JSON-encoded. Responses will also be JSON-encoded, and will follow one of the two formats:
 
-`{"success": false, "error": "Message in plain English"}`
-`{"success": true, "data": {/* Method-specific data */}}`
+    {"success": false, "error": "Message in plain English"}
+    {"success": true, "data": {/* Method-specific data */}}
 
 Logged-in Users
 ---------------

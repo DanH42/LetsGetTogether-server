@@ -79,9 +79,14 @@ app.get('/api', function(req, res){
 	fs.readFile('README.md', function(err, data){
 		if(!err && data){
 			marked(data + '', function(err, html){
-				if(!err && data)
-					res.send(html);
-				else
+				if(!err && data){
+					fs.readFile('docs.head.html', function(err, head){
+						if(!err && head)
+							res.send(head + html);
+						else
+							res.send(html);
+					});
+				}else
 					res.send("Unable to display API docs :(");
 			});
 		}else

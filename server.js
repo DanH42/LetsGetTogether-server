@@ -92,6 +92,14 @@ app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 
 // Given the access token of a logged-in user, get their account details
 app.post('/api/getUserData', function(req, res){
+	authUser(req, res, function(user){
+		res.send(user);
+	});
+});
+
+// The supplied callback will be called only if the request contains a valid
+// user access token. Otherwise, an error will be sent as a response.
+function authUser(req, res, callback){
 	if(!req.json.token)
 		return res.sendError("No user access token supplied");
 
@@ -101,9 +109,9 @@ app.post('/api/getUserData', function(req, res){
 	db.users.findOne({id: userID}, function(err, user){
 		if(err || !user)
 			return res.sendError("Invalid access token");
-		res.send(user);
+		callback(user);
 	});
-});
+}
 
 // The supplied callback will be called only if the request contains a valid
 // and active API key. Otherwise, an error will be sent as a response.

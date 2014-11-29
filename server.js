@@ -61,7 +61,7 @@ var mongo = new (require("mongolian"))({log:{debug:function(){}}}).db("get2gethe
 var db = {
 	apps: mongo.collection("apps"),
 	users: mongo.collection("users"),
-	reviews: mongo.collection("reviews")
+	checkins: mongo.collection("checkins")
 };
 
 // If someone simply requests /api, render the readme as HTML
@@ -137,6 +137,36 @@ app.post('/api/getUserData', function(req, res){
 		res.send(user);
 	});
 });
+
+// Update the current location of a logged-in user
+app.post('/api/checkin', function(req, res){
+	authUser(req, res, function(user){
+		if(!(req.json.lat && req.json.lng && req.json.accuracy))
+			return res.sendError("Must supply lat, lng, and accuracy");
+
+		// Update the user's location if they have one, otherwise insert
+		db.checkins.update({
+			id: user.id
+		}, {
+			id: user.id,
+			time: moment().unix(),
+			accuracy: accuracy,
+			loc: {
+				lon: lng,
+				lat: lat
+			}
+		}, true, function(){
+			// TODO: return a list of nearby users
+			res.send({success: true});
+		});
+	});
+});
+
+
+  //////////////////////////////////
+ // Application-only API methods //
+//////////////////////////////////
+
 
 // Temporary way to create an API key. This should be replaced with something
 // more robust and less prone to collisions

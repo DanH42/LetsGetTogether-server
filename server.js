@@ -50,6 +50,8 @@ app.use(function(req, res, next){
 	res.sendError = function(err){
 		res.send({error: err});
 	}
+
+	next();
 });
 
 app.listen(8800, '127.0.0.1');

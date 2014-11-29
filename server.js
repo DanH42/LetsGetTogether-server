@@ -45,10 +45,20 @@ app.use(function(req, res, next){
 	});
 });
 
-// Add a res.sendError function to all requests
+// Add res.error() and res.success() functions to all requests
 app.use(function(req, res, next){
-	res.sendError = function(err){
-		res.send({error: err});
+	res.error = function(err){
+		res.send({
+			success: false,
+			error: err
+		});
+	}
+
+	res.success = function(data){
+		res.send({
+			success: true,
+			data: data
+		});
 	}
 
 	next();
@@ -102,14 +112,14 @@ function guid(){
 // user access token. Otherwise, an error will be sent as a response.
 function authUser(req, res, callback){
 	if(!req.json.token)
-		return res.sendError("No user access token supplied");
+		return res.error("No user access token supplied");
 
 	// Again, this should actually be checked. Instead, we just strip out the
 	// first 4 characters and see if that user ID exists in the database.
 	var userID = req.json.token.substr(4);
 	db.users.findOne({id: userID}, function(err, user){
 		if(err || !user)
-			return res.sendError("Invalid access token");
+			return res.error("Invalid access token");
 		callback(user);
 	});
 }
@@ -118,23 +128,23 @@ function authUser(req, res, callback){
 // and active API key. Otherwise, an error will be sent as a response.
 function checkAuth(req, res, callback){
 	if(!req.json.apiKey)
-		return res.sendError("No API key supplied");
+		return res.error("No API key supplied");
 
 	db.apps.findOne({key: req.json.apiKey}, function(err, app){
 		if(!err && app){
 			if(!app.isDisabled)
 				callback();
 			else
-				res.sendError("Your API access has been disabled");
+				res.error("Your API access has been disabled");
 		}else
-			res.sendError("Invalid API key supplied");
+			res.error("Invalid API key supplied");
 	});
 }
 
 // Given the access token of a logged-in user, get their account details
 app.post('/api/getUserData', function(req, res){
 	authUser(req, res, function(user){
-		res.send(user);
+		res.success(user);
 	});
 });
 
@@ -142,7 +152,7 @@ app.post('/api/getUserData', function(req, res){
 app.post('/api/checkin', function(req, res){
 	authUser(req, res, function(user){
 		if(!(req.json.lat && req.json.lng && req.json.accuracy))
-			return res.sendError("Must supply lat, lng, and accuracy");
+			return res.error("Must supply lat, lng, and accuracy");
 
 		// Update the user's location if they have one, otherwise insert
 		db.checkins.update({
@@ -157,7 +167,7 @@ app.post('/api/checkin', function(req, res){
 			}
 		}, true, function(){
 			// TODO: return a list of nearby users
-			res.send({success: true});
+			res.success();
 		});
 	});
 });
@@ -181,11 +191,11 @@ app.all('/api/createApp', function(req, res){
 		isDisabled: false
 	});
 
-	res.send({apiKey: key});
+	res.success({apiKey: key});
 });
 
 app.post('/api/checkAuth', function(req, res){
 	checkAuth(req, res, function(){
-		res.send({success: true});
+		res.success();
 	});
 });

@@ -50,8 +50,6 @@ app.use(function(req, res, next){
 	res.sendError = function(err){
 		res.send({error: err});
 	}
-
-	next();
 });
 
 app.listen(8800, '127.0.0.1');
@@ -90,12 +88,13 @@ app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 	res.redirect('/#/auth/' + s4() + req.user.id);
 });
 
-// Given the access token of a logged-in user, get their account details
-app.post('/api/getUserData', function(req, res){
-	authUser(req, res, function(user){
-		res.send(user);
-	});
-});
+function s4(){
+	return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+}
+
+function guid(){
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
 
 // The supplied callback will be called only if the request contains a valid
 // user access token. Otherwise, an error will be sent as a response.
@@ -130,13 +129,12 @@ function checkAuth(req, res, callback){
 	});
 }
 
-function s4(){
-	return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-}
-
-function guid(){
-	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-}
+// Given the access token of a logged-in user, get their account details
+app.post('/api/getUserData', function(req, res){
+	authUser(req, res, function(user){
+		res.send(user);
+	});
+});
 
 // Temporary way to create an API key. This should be replaced with something
 // more robust and less prone to collisions

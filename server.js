@@ -19,7 +19,8 @@ passport.use(new FacebookStrategy({
 			var newUser = {
 				id: profile.id,
 				name: profile.displayName,
-				image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100"
+				image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100",
+				location: []
 			};
 			db.users.insert(newUser);
 			done(null, newUser);
@@ -70,9 +71,10 @@ app.listen(8800, '127.0.0.1');
 var mongo = new (require("mongolian"))({log:{debug:function(){}}}).db("get2gether");
 var db = {
 	apps: mongo.collection("apps"),
-	users: mongo.collection("users"),
-	checkins: mongo.collection("checkins")
+	users: mongo.collection("users")
 };
+// This really needs to be run once, but will be skipped if the index already exists
+db.users.ensureIndex({location: "2d"});
 
 // If someone simply requests /api, render the readme as HTML
 app.get('/api', function(req, res){
@@ -146,6 +148,12 @@ function checkAuth(req, res, callback){
 	});
 }
 
+
+  ///////////////////////////
+ // Logged-in API methods //
+///////////////////////////
+
+
 // Given the access token of a logged-in user, get their account details
 app.post('/api/getUserData', function(req, res){
 	authUser(req, res, function(user){
@@ -160,17 +168,13 @@ app.post('/api/checkin', function(req, res){
 			return res.error("Must supply lat, lng, and accuracy");
 
 		// Update the user's location if they have one, otherwise insert
-		db.checkins.update({
+		db.users.update({
 			id: user.id
 		}, {
-			id: user.id,
-			time: moment().unix(),
-			accuracy: accuracy,
-			loc: {
-				lon: lng,
-				lat: lat
+			$set: {
+				location: [lng, lat]
 			}
-		}, true, function(){
+		}, function(){
 			// TODO: return a list of nearby users
 			res.success();
 		});
@@ -199,8 +203,23 @@ app.all('/api/createApp', function(req, res){
 	res.success({apiKey: key});
 });
 
+// Return {success: true} when a valid API Key is supplied
 app.post('/api/checkAuth', function(req, res){
 	checkAuth(req, res, function(){
 		res.success();
+	});
+});
+
+app.post('/api/getUsers', function(req, res){
+	checkAuth(req, res, function(){
+		if(req.json.lat && req.json.lng){
+			if(req.json.radius){
+				//
+			}else if(req.json.num){
+				//
+			}else
+				res.error("No constraints supplied");
+		}else
+			res.error("No location supplied");
 	});
 });

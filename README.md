@@ -27,7 +27,7 @@ Assuming the user is logged in, the data returned will contain the user's `name`
 
 ### Checking in
 
-Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The Accuracy parameter should be an integer reflecting the number of digits after the decimal should be considered accurate. For example, the location `[-88.1234, 41.6789]` would have an accuracy of `4`.
+Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The accuracy parameter should be an integer reflecting the number of digits after the decimal should be considered accurate. For example, the location `[-88.1234, 41.6789]` would have an accuracy of `4`.
 
     POST https://get2gether.me/api/checkin
     '{"token": "701263719222018", "lat": 41.6789, "lng": -88.1234, "accuracy": 4}'

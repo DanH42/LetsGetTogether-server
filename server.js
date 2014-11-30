@@ -73,7 +73,7 @@ var db = {
 	apps: mongo.collection("apps"),
 	users: mongo.collection("users")
 };
-// This really needs to be run once, but will be skipped if the index already exists
+// This only needs to be run once, but will be skipped if the index already exists
 db.users.ensureIndex({location: "2d"});
 
 // If someone simply requests /api, render the readme as HTML

@@ -172,11 +172,24 @@ app.post('/api/checkin', function(req, res){
 			id: user.id
 		}, {
 			$set: {
-				location: [lng, lat]
+				location: [req.json.lng, req.json.lat]
 			}
 		}, function(){
-			// TODO: return a list of nearby users
-			res.success();
+			// Find the 10 nearest users within (about) 10 miles (.15 degrees)
+			db.users.find({
+				location: {
+					$geoWithin: {
+						$center:[
+							[req.json.lng, req.json.lat], .15
+						]
+					}
+				}
+			}).limit(10).toArray(function(err, users){
+				if(err)
+					return res.error(error);
+
+				res.success({users: users});
+			});
 		});
 	});
 });

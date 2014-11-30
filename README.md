@@ -32,7 +32,7 @@ Users can check in with their current location at any time. The request must sup
     POST https://get2gether.me/api/checkin
     {"token": "701263719222018", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}
 
-In the future, calling this method should return a list of other nearby users.
+Once the user's location has been updated, you will receive a response containing the information of up to 10 users that are within 10 miles of their location (sorted by distance).
 
 Applications
 ------------
@@ -52,7 +52,7 @@ The example API key provided is valid but disabled, meaning you should get the f
 
 ### Listing users
 
-Your application can list nearby users by providing a location and either a maximum limit (`num`) or a `radius`. The radius is defined by degrees of latitude. To get all users within .1 degrees (about 70 miles) of downtown Chicago, the following request would be used:
+Your application can list nearby users by providing a location and either a maximum limit (`num`) or a `radius`. The radius is defined by degrees of latitude. To get all users within .1 degrees (about 7 miles) of downtown Chicago, the following request would be used:
 
     POST https://get2gether.me/api/getUsers
     {"apiKey": "698d452e-3542-47eb-065c-cb6214d7541d", "lat": 41.879215, "lng": -87.631636, "radius": 0.1}

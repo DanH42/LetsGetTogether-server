@@ -21,22 +21,43 @@ This is the API level used by user-facing interfaces like get2gether.me and the 
 Once you have a user's access token, the following method can be used to retrieve that user's personal data:
 
     POST https://get2gether.me/api/getUserData
-    '{"token": "701263719222018"}'
+    {"token": "701263719222018"}
 
 Assuming the user is logged in, the data returned will contain the user's `name`, `id`, and `image` URL.
 
 ### Checking in
 
-Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The accuracy parameter should be an integer reflecting the number of digits after the decimal should be considered accurate. For example, the location `[-88.1234, 41.6789]` would have an accuracy of `4`.
+Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The accuracy parameter should be an integer reflecting the number of digits after the decimal should be considered accurate. For example, the location `[-87.6316, 41.8792]` would have an accuracy of `4`.
 
     POST https://get2gether.me/api/checkin
-    '{"token": "701263719222018", "lat": 41.6789, "lng": -88.1234, "accuracy": 4}'
+    {"token": "701263719222018", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}
 
 In the future, calling this method should return a list of other nearby users.
 
 Applications
 ------------
 
-This API level is intended to be used by those interested in bulk statistics. Information obtained at this level should generally not be made public without first being anonymized.
+This API level is intended to be used by those interested in bulk statistics. Information obtained at this level should generally not be made public without first being anonymized. All requests at this level must be authenticated using an API key.
 
-*Details coming soon.*
+### Verifying credentials
+
+To programmatically ensure that your API key is valid, active, and allowed to make queries, the following helper method is available:
+
+    POST https://get2gether.me/api/checkAuth
+    {"apiKey": "698d452e-3542-47eb-065c-cb6214d7541d"}
+
+The example API key provided is valid but disabled, meaning you should get the following response:
+
+    {"success": false, "error": "Your API access has been disabled"}
+
+### Listing users
+
+Your application can list nearby users by providing a location and either a maximum limit (`num`) or a `radius`. The radius is defined by degrees of latitude. To get all users within .1 degrees (about 70 miles) of downtown Chicago, the following request would be used:
+
+    POST https://get2gether.me/api/getUsers
+    {"apiKey": "698d452e-3542-47eb-065c-cb6214d7541d", "lat": 41.879215, "lng": -87.631636, "radius": 0.1}
+
+To return the 5 users closest to the downtown area, just replace `radius` with `num`:
+
+    POST https://get2gether.me/api/getUsers
+    {"apiKey": "698d452e-3542-47eb-065c-cb6214d7541d", "lat": 41.879215, "lng": -87.631636, "num": 5}

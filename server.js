@@ -214,9 +214,31 @@ app.post('/api/getUsers', function(req, res){
 	checkAuth(req, res, function(){
 		if(req.json.lat && req.json.lng){
 			if(req.json.radius){
-				//
+				db.users.find({
+					location: {
+						$geoWithin: {
+							$center:[
+								[req.json.lng, req.json.lat], req.json.radius
+							]
+						}
+					}
+				}).toArray(function(err, users){
+					if(err)
+						return res.error(error);
+
+					res.send({users: users});
+				});
 			}else if(req.json.num){
-				//
+				db.users.find({
+					location: {
+						$near: [req.json.lng, req.json.lat]
+					}
+				}).limit(req.json.num).toArray(function(err, users){
+					if(err)
+						return res.error(error);
+
+					res.send({users: users});
+				});
 			}else
 				res.error("No constraints supplied");
 		}else

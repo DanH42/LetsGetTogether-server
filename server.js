@@ -226,7 +226,7 @@ app.post('/api/getUsers', function(req, res){
 					if(err)
 						return res.error(error);
 
-					res.send({users: users});
+					res.success({users: users});
 				});
 			}else if(req.json.num){
 				db.users.find({
@@ -237,7 +237,7 @@ app.post('/api/getUsers', function(req, res){
 					if(err)
 						return res.error(error);
 
-					res.send({users: users});
+					res.success({users: users});
 				});
 			}else
 				res.error("No constraints supplied");

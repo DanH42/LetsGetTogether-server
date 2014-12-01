@@ -49,7 +49,7 @@ app.use(function(req, res, next){
 // Add res.error() and res.success() functions to all requests
 app.use(function(req, res, next){
 	res.error = function(err){
-		logLine(["ERROR", req.path, req.postData, JSON.stringify(err));
+		logLine(["ERROR", req.path, req.postData, JSON.stringify(err)]);
 
 		res.send({
 			success: false,

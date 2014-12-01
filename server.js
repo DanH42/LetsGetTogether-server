@@ -49,7 +49,7 @@ app.use(function(req, res, next){
 // Add res.error() and res.success() functions to all requests
 app.use(function(req, res, next){
 	res.error = function(err){
-		console.log("ERROR\t" + req.path + "\t" + req.postData + "\t" + JSON.stringify(err));
+		logLine(["ERROR", req.path, req.postData, JSON.stringify(err));
 
 		res.send({
 			success: false,
@@ -58,7 +58,7 @@ app.use(function(req, res, next){
 	}
 
 	res.success = function(data){
-		console.log("SUCCESS\t" + req.path + "\t" + JSON.stringify(req.json) + "\t" + JSON.stringify(data));
+		logLine(["SUCCESS", req.path, JSON.stringify(req.json), JSON.stringify(data)]);
 
 		res.send({
 			success: true,
@@ -79,6 +79,13 @@ var db = {
 };
 // This only needs to be run once, but will be skipped if the index already exists
 db.users.ensureIndex({location: "2d"});
+
+var logStream = fs.createWriteStream('api.log', {'flags': 'w'});
+function logLine(line){
+	var lineStr = moment().format('MMMM Do YYYY, h:mm:ss a') + "\t" + line.join("\t");
+	console.log(lineStr);
+	logStream.write(lineStr + '\n');
+}
 
 // If someone simply requests /api, render the readme as HTML
 app.get('/api', function(req, res){

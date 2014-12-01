@@ -164,8 +164,8 @@ app.post('/api/getUserData', function(req, res){
 // Update the current location of a logged-in user
 app.post('/api/checkin', function(req, res){
 	authUser(req, res, function(user){
-		if(!(req.json.lat && req.json.lng && req.json.accuracy))
-			return res.error("Must supply lat, lng, and accuracy");
+		if(isNaN(req.json.lat + req.json.lng + req.json.accuracy))
+			return res.error("Must supply lat, lng, and accuracy as numbers");
 
 		// Update the user's location if they have one, otherwise insert
 		db.users.update({
@@ -225,8 +225,8 @@ app.post('/api/checkAuth', function(req, res){
 
 app.post('/api/getUsers', function(req, res){
 	checkAuth(req, res, function(){
-		if(req.json.lat && req.json.lng){
-			if(req.json.radius){
+		if(!isNaN(req.json.lat + req.json.lng)){
+			if(!isNaN(req.json.radius)){
 				db.users.find({
 					location: {
 						$geoWithin: {
@@ -241,7 +241,7 @@ app.post('/api/getUsers', function(req, res){
 
 					res.success({users: users});
 				});
-			}else if(req.json.num){
+			}else if(!isNaN(req.json.num)){
 				db.users.find({
 					location: {
 						$near: [req.json.lng, req.json.lat]
@@ -253,8 +253,8 @@ app.post('/api/getUsers', function(req, res){
 					res.success({users: users});
 				});
 			}else
-				res.error("No constraints supplied");
+				res.error("No valid constraints supplied");
 		}else
-			res.error("No location supplied");
+			res.error("No location supplied (or arguments were not numbers)");
 	});
 });

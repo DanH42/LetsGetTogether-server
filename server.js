@@ -269,3 +269,5 @@ app.post('/api/getUsers', function(req, res){
 			res.error("No location supplied (or arguments were not numbers)");
 	});
 });
+
+logLine(["INFO", "Started."]);

@@ -30,14 +30,14 @@ passport.use(new FacebookStrategy({
 
 // Add req.json to all incoming requests to easily process data
 app.use(function(req, res, next){
-	var data = '';
+	req.postData = '';
 	req.setEncoding('utf8');
 	req.on('data', function(chunk){
-		data += chunk;
+		req.postData += chunk;
 	});
 	req.on('end', function(){
 		try{
-			req.json = JSON.parse(data);
+			req.json = JSON.parse(req.postData);
 		}catch(e){
 			req.json = {};
 		}
@@ -49,6 +49,8 @@ app.use(function(req, res, next){
 // Add res.error() and res.success() functions to all requests
 app.use(function(req, res, next){
 	res.error = function(err){
+		console.log("ERROR\t" + req.path + "\t" + req.postData + "\t" + JSON.stringify(err));
+
 		res.send({
 			success: false,
 			error: err
@@ -56,6 +58,8 @@ app.use(function(req, res, next){
 	}
 
 	res.success = function(data){
+		console.log("SUCCESS\t" + req.path + "\t" + JSON.stringify(req.json) + "\t" + JSON.stringify(data));
+
 		res.send({
 			success: true,
 			data: data

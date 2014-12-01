@@ -186,12 +186,12 @@ app.post('/api/checkin', function(req, res){
 				location: [req.json.lng, req.json.lat]
 			}
 		}, function(){
-			// Find the 10 nearest users within (about) 70 miles (1 degree)
+			// Find the 10 nearest users within (about) 20 miles (.3 degrees)
 			db.users.find({
 				location: {
 					$geoWithin: {
 						$center:[
-							[req.json.lng, req.json.lat], 1.0
+							[req.json.lng, req.json.lat], .3
 						]
 					}
 				}

@@ -180,7 +180,7 @@ app.post('/api/checkin', function(req, res){
 				location: {
 					$geoWithin: {
 						$center:[
-							[req.json.lng, req.json.lat], .15
+							[req.json.lng, req.json.lat], .45
 						]
 					}
 				}

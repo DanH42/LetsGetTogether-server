@@ -32,7 +32,7 @@ Users can check in with their current location at any time. The request must sup
     POST https://get2gether.me/api/checkin
     {"token": "ce8190...6a84a5", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}
 
-Once the user's location has been updated, you will receive a response containing the information of up to 10 users that are within 10 miles of their location (sorted by distance).
+Once the user's location has been updated, you will receive a response containing the information of up to 10 users that are within 30 miles of their location (sorted by distance).
 
 ### Logging Out
 

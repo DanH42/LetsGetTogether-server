@@ -34,7 +34,7 @@ The following fields will be available:
 
 ### Checking In
 
-Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The accuracy parameter should be an integer reflecting the number of digits after the decimal should be considered accurate. For example, the location `[-87.6316, 41.8792]` would have an accuracy of `4`.
+Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The accuracy parameter should be an integer reflecting the number of digits after the decimal that should be considered accurate. For example, the location `[-87.6316, 41.8792]` would have an accuracy of `4`.
 
     POST https://get2gether.me/api/checkin
     {"token": "ce8190...6a84a5", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}

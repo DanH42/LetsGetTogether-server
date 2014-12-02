@@ -147,10 +147,15 @@ function authUser(req, res, callback){
 	if(!req.json.token)
 		return res.error("No user access token supplied");
 
-	db.logins.findOne({token: req.json.token}, function(err, user){
-		if(err || !user)
+	db.logins.findOne({token: req.json.token}, function(err, login){
+		if(err || !login)
 			return res.error("Invalid access token");
-		callback(user);
+
+		db.users.findOne({id: login.id}, function(err, user){
+			if(err || !user)
+				return res.error("Unable to load user data");
+			callback(user);
+		});
 	});
 }
 

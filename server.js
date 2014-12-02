@@ -20,6 +20,7 @@ passport.use(new FacebookStrategy({
 				id: profile.id,
 				name: profile.displayName,
 				image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100",
+				lastCheckIn: 0,
 				location: []
 			};
 			db.users.insert(newUser);
@@ -175,7 +176,8 @@ function sanitizeUser(user){
 		id: user.id,
 		name: user.name,
 		image: user.image,
-		location: user.location
+		location: user.location,
+		lastCheckIn: user.lastCheckIn
 	};
 }
 
@@ -199,11 +201,16 @@ app.post('/api/checkin', function(req, res){
 		if(isNaN(req.json.lat + req.json.lng + req.json.accuracy))
 			return res.error("Must supply lat, lng, and accuracy as numbers");
 
+		var timestamp = moment().unix();
+		if(timestamp - user.lastCheckIn < 10)
+			return res.error("You may only check in once every 10 seconds");
+
 		// Update the user's location if they have one, otherwise insert
 		db.users.update({
 			id: user.id
 		}, {
 			$set: {
+				lastCheckIn: timestamp,
 				location: [req.json.lng, req.json.lat]
 			}
 		}, function(){

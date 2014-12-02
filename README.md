@@ -23,6 +23,14 @@ Once you have a user's access token, the following method can be used to retriev
     POST https://get2gether.me/api/getUserData
     {"token": "ce8190...6a84a5"}
 
+The following fields will be available:
+
+    *id:* The user's unique numeric ID
+    *name:* The user's first and last name
+    *image:* A link to the user's profile picture (100x100 px)
+    *location:* An array of length 2 with the user's latitude and longitude as floats, or empty (`[]`) if the user has never checked in
+    *lastCheckIn:* The timestamp, in seconds, that the user last checked in (`0` if they never have)
+
 Assuming the user is logged in, the data returned will contain the user's `name`, `id`, and `image` URL.
 
 ### Checking In
@@ -32,7 +40,7 @@ Users can check in with their current location at any time. The request must sup
     POST https://get2gether.me/api/checkin
     {"token": "ce8190...6a84a5", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}
 
-Once the user's location has been updated, you will receive a response containing the information of up to 10 users that are within 30 miles of their location (sorted by distance).
+Once the user's location has been updated, you will receive a response containing the information of up to 10 users that are within 30 miles of their location (sorted by distance). A user may not check in twice in a 10-second period.
 
 ### Logging Out
 

@@ -178,6 +178,7 @@ function sanitizeUser(user){
 		name: user.name,
 		image: user.image,
 		location: user.location,
+		accuracy: user.accuracy,
 		lastCheckIn: user.lastCheckIn
 	};
 }

@@ -75,7 +75,8 @@ app.listen(8800, '127.0.0.1');
 var mongo = new (require("mongolian"))({log:{debug:function(){}}}).db("get2gether");
 var db = {
 	apps: mongo.collection("apps"),
-	users: mongo.collection("users")
+	users: mongo.collection("users"),
+	logins: mongo.collection("logins")
 };
 // This only needs to be run once, but will be skipped if the index already exists
 db.users.ensureIndex({location: "2d"});
@@ -113,17 +114,29 @@ app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 	failureRedirect: '/#/authFailure',
 	session: false
 }), function(req, res){
-	// This should be a real, temporary access token. Instead, it's 4 random 
-	// numbers hung on the front of the user's ID.
-	res.redirect('/#/auth/' + s4() + req.user.id);
+	var token = randomToken();
+	db.logins.insert({
+		id: req.user.id,
+		token: token,
+		time: moment().unix()
+	}, function(){
+		res.redirect('/#/auth/' + token);
+	});
 });
 
+// Return 4 random characters in [0-9a-f]
 function s4(){
 	return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
 }
 
+// Return a v4 pseudo-UUID in the form xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 function guid(){
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+
+// Return a random access token in the form xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+function randomToken(){
+	return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
 }
 
 // The supplied callback will be called only if the request contains a valid
@@ -132,10 +145,7 @@ function authUser(req, res, callback){
 	if(!req.json.token)
 		return res.error("No user access token supplied");
 
-	// Again, this should actually be checked. Instead, we just strip out the
-	// first 4 characters and see if that user ID exists in the database.
-	var userID = req.json.token.substr(4);
-	db.users.findOne({id: userID}, function(err, user){
+	db.logins.findOne({token: req.json.token}, function(err, user){
 		if(err || !user)
 			return res.error("Invalid access token");
 		callback(user);
@@ -201,6 +211,29 @@ app.post('/api/checkin', function(req, res){
 
 				res.success({users: users});
 			});
+		});
+	});
+});
+
+// Invalidate the given user token
+app.post('/api/logout', function(req, res){
+	// By authorizing the user, we know the given token is valid
+	authUser(req, res, function(user){
+		db.logins.remove({
+			token: req.json.token
+		}, function(){
+			res.success();
+		});
+	});
+});
+
+// Invalidate ALL tokens for the user given
+app.post('/api/logoutAll', function(req, res){
+	authUser(req, res, function(user){
+		db.logins.remove({
+			id: user.id
+		}, function(){
+			res.success();
 		});
 	});
 });

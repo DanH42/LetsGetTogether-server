@@ -21,18 +21,30 @@ This is the API level used by user-facing interfaces like get2gether.me and the 
 Once you have a user's access token, the following method can be used to retrieve that user's personal data:
 
     POST https://get2gether.me/api/getUserData
-    {"token": "701263719222018"}
+    {"token": "ce8190...6a84a5"}
 
 Assuming the user is logged in, the data returned will contain the user's `name`, `id`, and `image` URL.
 
-### Checking in
+### Checking In
 
 Users can check in with their current location at any time. The request must supply the user's `lat`, `lng`, and the location's `accuracy`. The accuracy parameter should be an integer reflecting the number of digits after the decimal should be considered accurate. For example, the location `[-87.6316, 41.8792]` would have an accuracy of `4`.
 
     POST https://get2gether.me/api/checkin
-    {"token": "701263719222018", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}
+    {"token": "ce8190...6a84a5", "lat": 41.8792, "lng": -87.6316, "accuracy": 4}
 
 Once the user's location has been updated, you will receive a response containing the information of up to 10 users that are within 10 miles of their location (sorted by distance).
+
+### Logging Out
+
+To log out your current session:
+
+    POST https://get2gether.me/api/logout
+    {"token": "ce8190...6a84a5"}
+
+Calling this method will imediately de-authorize the given token, and all subsequent calls using that token will fail. You can also log out *all* sessions for your current user, regardless of the token they're using:
+
+    POST https://get2gether.me/api/logoutAll
+    {"token": "ce8190...6a84a5"}
 
 Applications
 ------------

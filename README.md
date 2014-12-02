@@ -29,6 +29,7 @@ The following fields will be available:
     *name:* The user's first and last name
     *image:* A link to the user's profile picture (100x100 px)
     *location:* An array of length 2 with the user's latitude and longitude as floats, or empty (`[]`) if the user has never checked in
+    *accuracy:* The accuracy given when the user last checked in (`0` if they never have)
     *lastCheckIn:* The timestamp, in seconds, that the user last checked in (`0` if they never have)
 
 Assuming the user is logged in, the data returned will contain the user's `name`, `id`, and `image` URL.

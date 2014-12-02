@@ -21,6 +21,7 @@ passport.use(new FacebookStrategy({
 				name: profile.displayName,
 				image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100",
 				lastCheckIn: 0,
+				accuracy: 0,
 				location: []
 			};
 			db.users.insert(newUser);
@@ -211,6 +212,7 @@ app.post('/api/checkin', function(req, res){
 		}, {
 			$set: {
 				lastCheckIn: timestamp,
+				accuracy: req.json.accuracy,
 				location: [req.json.lng, req.json.lat]
 			}
 		}, function(){

@@ -169,6 +169,16 @@ function checkAuth(req, res, callback){
 	});
 }
 
+// Only include the fields we really want
+function sanitizeUser(user){
+	return {
+		id: user.id,
+		name: user.name,
+		image: user.image,
+		location: user.location
+	};
+}
+
 
   ///////////////////////////
  // Logged-in API methods //
@@ -178,7 +188,8 @@ function checkAuth(req, res, callback){
 // Given the access token of a logged-in user, get their account details
 app.post('/api/getUserData', function(req, res){
 	authUser(req, res, function(user){
-		res.success(user);
+		// Only include the fields we really want
+		res.success(sanitizeUser(user));
 	});
 });
 
@@ -209,7 +220,16 @@ app.post('/api/checkin', function(req, res){
 				if(err)
 					return res.error(error);
 
-				res.success({users: users});
+				var tempUsers = [];
+				for(var i = 0; i < users.length; i++){
+					var tempUser = users[i];
+					if(tempUser.id === user.id)
+						continue; // Don't include the current user
+
+					tempUsers.push(sanitizeUser(tempUser));
+				}
+
+				res.success({users: tempUsers});
 			});
 		});
 	});
@@ -283,7 +303,11 @@ app.post('/api/getUsers', function(req, res){
 					if(err)
 						return res.error(error);
 
-					res.success({users: users});
+					var tempUsers = [];
+					for(var i = 0; i < users.length; i++)
+						tempUsers.push(sanitizeUser(users[i]));
+
+					res.success({users: tempUsers});
 				});
 			}else if(!isNaN(req.json.num)){
 				db.users.find({
@@ -294,7 +318,11 @@ app.post('/api/getUsers', function(req, res){
 					if(err)
 						return res.error(error);
 
-					res.success({users: users});
+					var tempUsers = [];
+					for(var i = 0; i < users.length; i++)
+						tempUsers.push(sanitizeUser(users[i]));
+
+					res.success({users: tempUsers});
 				});
 			}else
 				res.error("No valid constraints supplied");

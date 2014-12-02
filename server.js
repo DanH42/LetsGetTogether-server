@@ -52,6 +52,15 @@ app.use(function(req, res, next){
 app.use(function(req, res, next){
 	res.error = function(err){
 		logLine(["ERROR", req.path, req.postData, JSON.stringify(err)]);
+		db.logs.insert({
+			timestamp: moment().unix(),
+			success: false,
+			ip: req.header('cf-connecting-ip'),
+			path: req.path,
+			postData: req.postData,
+			json: req.json,
+			error: err
+		});
 
 		res.send({
 			success: false,
@@ -61,6 +70,15 @@ app.use(function(req, res, next){
 
 	res.success = function(data){
 		logLine(["SUCCESS", req.path, JSON.stringify(req.json), JSON.stringify(data)]);
+		db.logs.insert({
+			timestamp: moment().unix(),
+			success: true,
+			ip: req.header('cf-connecting-ip'),
+			path: req.path,
+			postData: req.postData,
+			json: req.json,
+			data: data
+		});
 
 		res.send({
 			success: true,
@@ -76,6 +94,7 @@ app.listen(8800, '127.0.0.1');
 // Initialize database connection
 var mongo = new (require("mongolian"))({log:{debug:function(){}}}).db("get2gether");
 var db = {
+	logs: mongo.collection("logs"),
 	apps: mongo.collection("apps"),
 	users: mongo.collection("users"),
 	logins: mongo.collection("logins")

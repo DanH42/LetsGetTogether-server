@@ -89,6 +89,14 @@ app.use(function(req, res, next){
 	next();
 });
 
+// Add CORS headers
+app.use(function(req, res, next){
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type');
+        next();
+});
+
 app.listen(8800, '127.0.0.1');
 
 // Initialize database connection

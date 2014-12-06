@@ -236,8 +236,8 @@ app.post('/api/checkin', function(req, res){
 			return res.error("Must supply lat, lng, and accuracy as numbers");
 
 		var timestamp = moment().unix();
-		if(timestamp - user.lastCheckIn < 10)
-			return res.error("You may only check in once every 10 seconds");
+//		if(timestamp - user.lastCheckIn < 10)
+//			return res.error("You may only check in once every 10 seconds");
 
 		// Update the user's location if they have one, otherwise insert
 		db.users.update({

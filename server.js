@@ -139,6 +139,19 @@ app.get('/api', function(req, res){
 
 app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}));
 
+app.get('/api/auth/facebook/ajax', passport.authenticate('facebook', {
+	session: false
+}), function(req, res){
+	var token = randomToken();
+	db.logins.insert({
+		id: req.user.id,
+		token: token,
+		time: moment().unix()
+	}, function(){
+		res.success({token: token});
+	});
+});
+
 app.get('/api/auth/facebook/callback', passport.authenticate('facebook', {
 	failureRedirect: '/#/authFailure',
 	session: false

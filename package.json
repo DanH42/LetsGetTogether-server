@@ -9,6 +9,7 @@
     "marked": "~0.3.2",
     "passport": "~0.2.1",
     "passport-facebook": "~1.0.3",
+    "passport-facebook-token": "~0.4.0",
     "moment": "~2.8.3"
   }
 }

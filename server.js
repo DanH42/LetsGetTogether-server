@@ -5,30 +5,38 @@ var marked = require('marked');
 var moment = require('moment');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
+var FacebookTokenStrategy = require('passport-facebook-token').Strategy;
+
+function facebookVerify(accessToken, refreshToken, profile, done){
+	db.users.findOne({id: profile.id}, function(err, user){
+		if(!err && user)
+			return done(null, user);
+
+		var newUser = {
+			id: profile.id,
+			name: profile.displayName,
+			image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100",
+			lastCheckIn: 0,
+			accuracy: 0,
+			location: []
+		};
+		db.users.insert(newUser);
+		done(null, newUser);
+	});
+}
 
 // These credentials shouldn't really be stored here, but meh
 passport.use(new FacebookStrategy({
-		clientID: "175237175154",
-		clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
-		callbackURL: "https://get2gether.me/api/auth/facebook/callback"
-	}, function(accessToken, refreshToken, profile, done){
-		db.users.findOne({id: profile.id}, function(err, user){
-			if(!err && user)
-				return done(null, user);
+	clientID: "175237175154",
+	clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
+	callbackURL: "https://get2gether.me/api/auth/facebook/callback"
+}, facebookVerify));
 
-			var newUser = {
-				id: profile.id,
-				name: profile.displayName,
-				image: "https://graph.facebook.com/" + profile.id + "/picture?width=100&height=100",
-				lastCheckIn: 0,
-				accuracy: 0,
-				location: []
-			};
-			db.users.insert(newUser);
-			done(null, newUser);
-		});
-	}
-));
+// This is used by the mobile application, which completes part of the login process
+passport.use(new FacebookTokenStrategy({
+	clientID: "175237175154",
+	clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
+}, facebookVerify));
 
 // Add req.json to all incoming requests to easily process data
 app.use(function(req, res, next){
@@ -139,7 +147,7 @@ app.get('/api', function(req, res){
 
 app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}));
 
-app.get('/api/auth/facebook/ajax', passport.authenticate('facebook', {
+app.get('/api/auth/facebook/ajax', passport.authenticate('facebook-token', {
 	session: false
 }), function(req, res){
 	var token = randomToken();

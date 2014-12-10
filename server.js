@@ -5,7 +5,6 @@ var marked = require('marked');
 var moment = require('moment');
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
-var FacebookTokenStrategy = require('passport-facebook-token').Strategy;
 
 app.use(passport.initialize());
 
@@ -32,12 +31,6 @@ passport.use(new FacebookStrategy({
 	clientID: "175237175154",
 	clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
 	callbackURL: "https://get2gether.me/api/auth/facebook/callback"
-}, facebookVerify));
-
-// This is used by the mobile application, which completes part of the login process
-passport.use(new FacebookTokenStrategy({
-	clientID: "175237175154",
-	clientSecret: "9e29a1dba3c5d2ccaec27f543848dbf2",
 }, facebookVerify));
 
 // Add req.json to all incoming requests to easily process data
@@ -149,16 +142,17 @@ app.get('/api', function(req, res){
 
 app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}));
 
-app.post('/api/auth/facebook/ajax', passport.authenticate('facebook-token', {
-	session: false
-}), function(req, res){
-	var token = randomToken();
-	db.logins.insert({
-		id: req.user.id,
-		token: token,
-		time: moment().unix()
-	}, function(){
-		res.success({token: token});
+// This route just pretends you're a real person
+app.post('/api/auth/facebook/ajax', function(req, res){
+	facebookVerify(null, null, req.json, function(err, user){
+		var token = randomToken();
+		db.logins.insert({
+			id: req.user.id,
+			token: token,
+			time: moment().unix()
+		}, function(){
+			res.success({token: token});
+		});
 	});
 });
 

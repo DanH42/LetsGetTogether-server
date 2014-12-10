@@ -149,7 +149,7 @@ app.get('/api', function(req, res){
 
 app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}));
 
-app.get('/api/auth/facebook/ajax', passport.authenticate('facebook-token', {
+app.post('/api/auth/facebook/ajax', passport.authenticate('facebook-token', {
 	session: false
 }), function(req, res){
 	var token = randomToken();

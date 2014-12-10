@@ -7,6 +7,8 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var FacebookTokenStrategy = require('passport-facebook-token').Strategy;
 
+app.use(passport.initialize());
+
 function facebookVerify(accessToken, refreshToken, profile, done){
 	db.users.findOne({id: profile.id}, function(err, user){
 		if(!err && user)

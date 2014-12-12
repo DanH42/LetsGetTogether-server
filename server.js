@@ -10,9 +10,6 @@ app.use(passport.initialize());
 
 function facebookVerify(accessToken, refreshToken, profile, done){
 	db.users.findOne({id: profile.id}, function(err, user){
-		if(user && !(user.id && user.displayName))
-			return done("Invalid user!", null);
-
 		if(!err && user)
 			return done(null, user);
 
@@ -147,6 +144,9 @@ app.get('/api/auth/facebook', passport.authenticate('facebook', {session: false}
 
 // This route just pretends you're a real person
 app.post('/api/auth/facebook/ajax', function(req, res){
+	if(!req.json.id || !req.json.displayName)
+		return res.error("Invalid user!");
+
 	facebookVerify(null, null, req.json, function(err, user){
 		if(err)
 			return res.error(err);
